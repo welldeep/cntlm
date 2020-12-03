@@ -50,6 +50,18 @@
 #endif
 
 /*
+ * debug trace print
+ */
+#define DEBUG_TRACE
+#ifdef DEBUG_TRACE
+#define TRACE(FORMAT, ...) \
+        do{printf("%s:%d:%s(): "FORMAT, __FILE__, \
+		__LINE__, __func__, __VA_ARGS__);}while(0)
+#else
+#define TRACE(FORMAT, ...) 
+#endif /* DEBUG_TRACE */
+
+/*
  * Two single-linked list types. First is for storing headers,
  * second keeps a list of finished threads or cached connections.
  * Each has a different set of manipulation routines.

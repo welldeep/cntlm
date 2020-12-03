@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <syslog.h>
+#include <time.h>
 
 #include "utils.h"
 #include "socket.h"
@@ -474,8 +475,12 @@ int tunnel(int cd, int sd) {
 	int ret;
 	int sel;
 	char *buf;
+	struct timeval timeout;
 
 	buf = zmalloc(BUFSIZE);
+
+	timeout.tv_sec = 5;
+	timeout.tv_usec = 0;
 
 	if (debug)
 		printf("tunnel: select cli: %d, srv: %d\n", cd, sd);
@@ -485,7 +490,7 @@ int tunnel(int cd, int sd) {
 		FD_SET(cd, &set);
 		FD_SET(sd, &set);
 
-		sel = select(FD_SETSIZE, &set, NULL, NULL, NULL);
+		sel = select(FD_SETSIZE, &set, NULL, NULL, &timeout);
 		if (sel > 0) {
 			if (FD_ISSET(cd, &set)) {
 				from = cd;
@@ -506,6 +511,12 @@ int tunnel(int cd, int sd) {
 			free(buf);
 			return 0;
 		}
+		else
+		{
+			TRACE("sel=%d\n", sel);
+			break;
+		}
+
 	} while (1);
 
 	free(buf);
