@@ -41,6 +41,7 @@
 #define BLOCK		2048
 
 extern int debug;
+extern int http_timeout;
 
 /*
  * True if src is a header. This is just a basic check
@@ -475,12 +476,22 @@ int tunnel(int cd, int sd) {
 	int ret;
 	int sel;
 	char *buf;
-	struct timeval timeout;
+	struct timeval timeout = {0}, *sel_timeout;
 
 	buf = zmalloc(BUFSIZE);
 
-	timeout.tv_sec = 5;
-	timeout.tv_usec = 0;
+	if (http_timeout)
+	{
+		timeout.tv_sec = http_timeout;
+		timeout.tv_usec = 0;
+		sel_timeout = &timeout;
+		TRACE("select wait time out: %d s\n", http_timeout);
+	}
+	else
+	{
+		sel_timeout = NULL;
+		TRACE("select wait time out: %s\n", "forever");
+	}
 
 	if (debug)
 		printf("tunnel: select cli: %d, srv: %d\n", cd, sd);
@@ -490,7 +501,7 @@ int tunnel(int cd, int sd) {
 		FD_SET(cd, &set);
 		FD_SET(sd, &set);
 
-		sel = select(FD_SETSIZE, &set, NULL, NULL, &timeout);
+		sel = select(FD_SETSIZE, &set, NULL, NULL, sel_timeout);
 		if (sel > 0) {
 			if (FD_ISSET(cd, &set)) {
 				from = cd;

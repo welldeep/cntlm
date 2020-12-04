@@ -82,6 +82,7 @@
  * from there again a few times to inner calls.
  */
 int debug = 0;					/* all debug printf's and possibly external modules */
+int http_timeout = 0;           /* timeout for bidirectional HTTP CONNECT connection in tunnel(), default 0 and wait forever */
 
 /**
  * Values and their meaning:
@@ -1310,6 +1311,16 @@ int main(int argc, char **argv) {
 		CFG_DEFAULT(cf, "NTLMToBasic", tmp, MINIBUF_SIZE);
 		if (!strcasecmp("yes", tmp))
 			ntlmbasic = 1;
+		free(tmp);
+
+		/*
+		 * Check timeout for http connection
+		 */
+		tmp = zmalloc(MINIBUF_SIZE);
+		CFG_DEFAULT(cf, "HttpTimeout", tmp, MINIBUF_SIZE);
+		TRACE("HttpTimeout=%s\n", tmp);
+		http_timeout = atoi(tmp);
+		http_timeout = abs(http_timeout);
 		free(tmp);
 
 		/*
