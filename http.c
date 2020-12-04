@@ -524,7 +524,7 @@ int tunnel(int cd, int sd) {
 		}
 		else
 		{
-			TRACE("sel=%d\n", sel);
+			TRACE("sel=%d, wait %d seconds timeout\n", sel, http_timeout);
 			break;
 		}
 

@@ -55,7 +55,7 @@
 #define DEBUG_TRACE
 #ifdef DEBUG_TRACE
 #define TRACE(FORMAT, ...) \
-        do{printf("%s:%d:%s(): "FORMAT, __FILE__, \
+        if(debug) do{printf("%s:%d:%s(): "FORMAT, __FILE__, \
 		__LINE__, __func__, __VA_ARGS__);}while(0)
 #else
 #define TRACE(FORMAT, ...) 
